@@ -33,7 +33,6 @@ if ($request_dir !== '' && (file_exists($real_target . '/index.php') || file_exi
 */
 
 // Calculate folder size
-// NOTE: This can be slow on large folders.
 function getDirectorySize($path)
 {
   $bytestotal = 0;
@@ -61,10 +60,8 @@ function formatSize($bytes)
 }
 
 // ICON SYSTEM
-// Add new file extensions or change colors here.
 function getFileIcon($ext)
 {
-  // 1. Define Colors for specific extensions
   $colors = [
     'php' => '#777bb3',
     'html' => '#e34c26',
@@ -76,20 +73,16 @@ function getFileIcon($ext)
     'img' => '#d63384'
   ];
 
-  // 2. Default "Code" Icon (used if no specific match found below)
   $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>';
 
-  // 3. Image Icon Logic
   if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'])) {
     return ['color' => '#d63384', 'svg' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>'];
   }
 
-  // 4. Archive/Zip Icon Logic
   if (in_array($ext, ['zip', 'rar', '7z', 'tar', 'gz'])) {
     return ['color' => '#db2777', 'svg' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>'];
   }
 
-  // 5. Code Icon Logic (Uses colors array)
   if (in_array($ext, ['php', 'html', 'css', 'js', 'py', 'json', 'sql'])) {
     $c = isset($colors[$ext]) ? $colors[$ext] : '#64748b';
     return ['color' => $c, 'svg' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>'];
@@ -107,20 +100,16 @@ $items = scandir($real_target);
 $folders = [];
 $files = [];
 
-// FILES TO HIDE: Add filenames or folders here to hide them from the dashboard
 $ignored = ['.', '..', 'dashboard', 'webalizer', 'xampp', 'img', 'favicon.ico', '.git', '.vscode', '.idea', 'node_modules'];
 
 foreach ($items as $item) {
-  // Skip ignored files
   if (in_array($item, $ignored)) continue;
-  // Don't show this script itself
   if ($request_dir == '' && $item == basename(__FILE__)) continue;
 
   $path = $real_target . '/' . $item;
   $relative_path = $request_dir ? $request_dir . '/' . $item : $item;
 
   if (is_dir($path)) {
-    // Add to Folder List
     $folders[] = [
       'name' => $item,
       'path' => '?dir=' . urlencode($relative_path),
@@ -128,7 +117,6 @@ foreach ($items as $item) {
       'size' => formatSize(getDirectorySize($path))
     ];
   } else {
-    // Add to File List
     $ext = pathinfo($path, PATHINFO_EXTENSION);
     $iconData = getFileIcon(strtolower($ext));
     $files[] = [
@@ -152,33 +140,27 @@ foreach ($items as $item) {
   <title>Dev Dashboard</title>
   <style>
     /* ========================================
-        CSS VARIABLES (THEME CONFIG)
-        Change colors here for Dark/Light modes
-        ========================================
-        */
+       CSS VARIABLES (THEME CONFIG)
+       ======================================== */
     :root {
       --radius: 16px;
-      /* Card rounded corners */
       --blur: 14px;
-      /* Glass effect intensity */
       --transition: 0.25s ease;
       --font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
-    /* --- DARK MODE COLORS --- */
+    /* DARK MODE */
     body[data-theme="dark"] {
       --bg: #0b0f1a;
       --bg-soft: rgba(255, 255, 255, 0.05);
-      /* Card background */
       --border: rgba(255, 255, 255, 0.08);
       --text: #e5e7eb;
       --text-muted: #9ca3af;
       --accent: #6366f1;
-      /* Main Blue/Purple color */
       --accent-glow: rgba(99, 102, 241, 0.35);
     }
 
-    /* --- LIGHT MODE COLORS --- */
+    /* LIGHT MODE */
     body[data-theme="light"] {
       --bg: #f5f7fb;
       --bg-soft: rgba(255, 255, 255, 0.7);
@@ -189,10 +171,6 @@ foreach ($items as $item) {
       --accent-glow: rgba(79, 70, 229, 0.25);
     }
 
-    /* ========================================
-        BASE STYLES
-        ========================================
-        */
     * {
       box-sizing: border-box;
     }
@@ -200,18 +178,17 @@ foreach ($items as $item) {
     body {
       margin: 0;
       font-family: var(--font);
-      /* Background Mesh Gradient */
       background: radial-gradient(1200px 600px at 10% -10%, var(--accent-glow), transparent),
         radial-gradient(800px 500px at 90% 10%, rgba(14, 165, 233, 0.2), transparent),
         var(--bg);
       color: var(--text);
       min-height: 100vh;
+      /* Flex column ensures footer stays at bottom */
+      display: flex;
+      flex-direction: column;
     }
 
-    /* ========================================
-        NAVBAR & HEADER
-        ========================================
-        */
+    /* NAVBAR */
     .navbar {
       position: sticky;
       top: 0;
@@ -221,7 +198,6 @@ foreach ($items as $item) {
       align-items: center;
       padding: 18px 28px;
       backdrop-filter: blur(var(--blur));
-      /* Glass effect */
       background: var(--bg-soft);
       border-bottom: 1px solid var(--border);
     }
@@ -239,7 +215,7 @@ foreach ($items as $item) {
       color: var(--accent);
     }
 
-    /* SEARCH BAR */
+    /* SEARCH */
     .search-container {
       position: relative;
       margin-right: 14px;
@@ -263,16 +239,12 @@ foreach ($items as $item) {
       transition: var(--transition);
     }
 
-    .search-input::placeholder {
-      color: var(--text-muted);
-    }
-
     .search-input:focus {
       border-color: var(--accent);
       box-shadow: 0 0 0 3px var(--accent-glow);
     }
 
-    /* THEME TOGGLE BUTTON */
+    /* THEME TOGGLE */
     .theme-btn {
       background: var(--bg-soft);
       border: 1px solid var(--border);
@@ -294,18 +266,15 @@ foreach ($items as $item) {
       display: none;
     }
 
-    /* ========================================
-        MAIN LAYOUT & GRID
-        ========================================
-        */
+    /* LAYOUT */
     .container {
       max-width: 1300px;
-      /* Max width of the dashboard */
       margin: auto;
       padding: 28px;
+      width: 100%;
     }
 
-    /* Breadcrumbs (Navigation links like Root > Folder > Subfolder) */
+    /* BREADCRUMBS */
     .breadcrumbs {
       display: flex;
       align-items: center;
@@ -343,18 +312,13 @@ foreach ($items as $item) {
       color: var(--text-muted);
     }
 
-    /* GRID SYSTEM: Controls how many cards appear per row */
     .grid {
       display: grid;
-      /* Auto-fill: Fit as many 260px cards as possible */
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
       gap: 18px;
     }
 
-    /* ========================================
-        CARD STYLING
-        ========================================
-        */
+    /* CARDS */
     .card {
       display: flex;
       align-items: center;
@@ -409,7 +373,6 @@ foreach ($items as $item) {
       color: var(--text-muted);
     }
 
-    /* EMPTY STATE */
     .empty-state {
       margin-top: 80px;
       text-align: center;
@@ -418,6 +381,44 @@ foreach ($items as $item) {
 
     .empty-state svg {
       margin-bottom: 12px;
+    }
+
+    /* FOOTER & KEYBOARD HINTS */
+    footer {
+      margin-top: auto;
+      /* Pushes footer to bottom */
+      padding: 30px 20px;
+      text-align: center;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: var(--bg-soft);
+      backdrop-filter: blur(var(--blur));
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    .kbd {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-family: monospace;
+      font-size: 0.8rem;
+      box-shadow: 0 2px 0 var(--border);
+      margin: 0 4px;
+      color: var(--text);
     }
   </style>
 
@@ -547,6 +548,11 @@ foreach ($items as $item) {
 
   </div>
 
+  <footer>
+    <div>Tip: Hit <span class="kbd">/</span> to search, <span class="kbd">D</span> to toggle theme.</div>
+    <div>Made with ❤️ by <a href="https://github.com/Rajdi16" target="_blank">Rajdi</a> — PHP <?php echo PHP_VERSION; ?></div>
+  </footer>
+
   <script>
     const themeBtn = document.getElementById('themeBtn');
     const body = document.body;
@@ -554,8 +560,8 @@ foreach ($items as $item) {
     const sunIcon = document.getElementById('sunIcon');
 
     /* ----------------------------
-    THEME MANAGEMENT LOGIC
-    ----------------------------
+       THEME MANAGEMENT LOGIC
+       ----------------------------
     */
     const currentTheme = localStorage.getItem('theme') || 'dark'; // Default to dark
     setTheme(currentTheme);
@@ -580,8 +586,8 @@ foreach ($items as $item) {
     });
 
     /* ----------------------------
-    LIVE SEARCH LOGIC
-    ----------------------------
+       LIVE SEARCH LOGIC
+       ----------------------------
     */
     document.getElementById('search').addEventListener('input', (e) => {
       const term = e.target.value.toLowerCase();
@@ -606,6 +612,27 @@ foreach ($items as $item) {
         const visibleItems = nextGrid.querySelectorAll('.search-item[style="display: flex;"]').length;
         title.style.display = visibleItems > 0 ? 'block' : 'none';
       });
+    });
+
+    /* ----------------------------
+       KEYBOARD SHORTCUTS
+       ----------------------------
+    */
+    document.addEventListener('keydown', (e) => {
+      // 1. If typing in search, ignore 'D', but allow ESC to blur
+      if (document.activeElement === document.getElementById('search')) {
+        if (e.key === 'Escape') document.getElementById('search').blur();
+        return;
+      }
+      // 2. Hotkey: "/" to Search
+      if (e.key === '/') {
+        e.preventDefault();
+        document.getElementById('search').focus();
+      }
+      // 3. Hotkey: "d" to Toggle Theme
+      if (e.key.toLowerCase() === 'd') {
+        themeBtn.click();
+      }
     });
   </script>
 </body>
