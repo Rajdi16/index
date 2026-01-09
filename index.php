@@ -244,7 +244,7 @@ foreach ($items as $item) {
       box-shadow: 0 0 0 3px var(--accent-glow);
     }
 
-    /* THEME TOGGLE */
+    /* THEME TOGGLE & DB BUTTON */
     .theme-btn {
       background: var(--bg-soft);
       border: 1px solid var(--border);
@@ -260,6 +260,25 @@ foreach ($items as $item) {
     .theme-btn:hover {
       transform: rotate(8deg) scale(1.05);
       box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .phpmyadmin-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: var(--transition);
+      color: white;
+      margin-right: 8px;
+    }
+
+    .phpmyadmin-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 20px rgba(102, 126, 234, 0.6);
     }
 
     .hidden {
@@ -445,6 +464,14 @@ foreach ($items as $item) {
         </svg>
         <input type="text" class="search-input" id="search" placeholder="Search projects..." autocomplete="off">
       </div>
+
+      <a href="http://localhost/phpmyadmin5.2.3/" target="_blank" class="phpmyadmin-btn" title="PHPMyAdmin - Database Manager">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+          <path d="M3 5v14a9 3 0 0 0 18 0V5"></path>
+          <path d="M3 12a9 3 0 0 0 18 0"></path>
+        </svg>
+      </a>
 
       <button class="theme-btn" id="themeBtn" title="Toggle Theme">
         <svg id="moonIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
